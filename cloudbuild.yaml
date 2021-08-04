@@ -1,0 +1,11 @@
+steps:
+  - name: maven:3-jdk-11
+    entrypoint: mvn
+    args: ["package", "-B","-Dmaven.test.skip=true"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/smart-proxy", "--build-arg=JAR_FILE=target/smart-proxy-1.0.0-SNAPSHOT.jar", "."]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'services', 'update','smart-proxy','--image', 'gcr.io/$PROJECT_ID/smart-proxy:latest', '--region', 'asia-south1', '--platform', 'managed', '--quiet']
+    
+images: ["gcr.io/$PROJECT_ID/smart-proxy"]
